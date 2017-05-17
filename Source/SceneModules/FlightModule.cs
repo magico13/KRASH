@@ -30,6 +30,10 @@ namespace KRASH
 
                 Log.Info("CallbackLevelWasLoaded");
                 //	KRASHShelter.instance.simPauseMenuInstance.AddToPostDrawQueue ();
+                if (KRASHShelter.TestFlightFailuresDisabled)
+                { //Disable part failures for the active vessel if Test Flight is installed and active
+                    disableTestFlightFailures();
+                }
             }
 
         }
@@ -61,6 +65,40 @@ namespace KRASH
             // DontDestroyOnLoad (this);  
         }
 
+        /// <summary>
+        /// Disable all part failures if the TestFlightFailuresDisabled setting was set during simulation configuration.
+        /// Note that you could probably use the actual API and not hit the TestFlightCore directly, but this is how I did it originally in KCT.
+        /// </summary>
+        private void disableTestFlightFailures()
+        {
+            Log.Info("Disabling TestFlight part failures.");
+            Type TestFlightInterface = AssemblyLoader.loadedAssemblies
+                    .Select(a => a.assembly.GetExportedTypes())
+                    .SelectMany(t => t)
+                    .FirstOrDefault(t => t.FullName == "TestFlightCore.TestFlightInterface");
+
+            bool TestFlightInstalled = (TestFlightInterface != null);
+
+            if (TestFlightInstalled)
+            {
+                foreach (Part part in FlightGlobals.ActiveVessel.Parts)
+                {
+                    bool tfAvailableOnPart = (bool)TestFlightInterface.InvokeMember("TestFlightAvailable", BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Static, null, null, new System.Object[] { part });
+                    if (tfAvailableOnPart)
+                    {
+                        //get all cores on the part
+                        foreach (string core in (List<string>)TestFlightInterface.InvokeMember("GetActiveCores", BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Static, null, null, new System.Object[] { part }))
+                        {
+                            foreach (string failureName in (List<string>)TestFlightInterface.InvokeMember("GetAvailableFailures", BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Static, null, null, new System.Object[] { part, core }))
+                            {
+                                Log.Info("Disabling failure '" + failureName + "' on '" + part.partInfo.name + "'");
+                                TestFlightInterface.InvokeMember("DisableFailure", BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Static, null, null, new System.Object[] { part, core, failureName });
+                            }
+                        }
+                    }
+                }
+            }
+        }
 #if false
 		void OnLevelWasLoaded (int i)
 		{

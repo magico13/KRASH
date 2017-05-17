@@ -1560,6 +1560,8 @@ namespace KRASH
 #endif
             }
 
+            KRASHShelter.TestFlightFailuresDisabled = GUILayout.Toggle(KRASHShelter.TestFlightFailuresDisabled, "Disable TestFlight");
+
             GUILayout.Space(10);
             GUIStyle fontColorYellow = new GUIStyle(GUI.skin.label);
             fontColorYellow.normal.textColor = Color.yellow;

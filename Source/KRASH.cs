@@ -105,12 +105,6 @@ namespace KRASH
                     Log.Info("KRASHShelter.simCost: " + KRASHShelter.simCost.ToString());
                     Log.Info("KRASHShelter.simSetupCost: " + KRASHShelter.simSetupCost.ToString());
 
-                    if (KRASHShelter.simCost + KRASHShelter.simSetupCost != 0 
-                        && KRASHShelter.startingFunds == Funding.Instance.Funds && 
-                        !KRASHShelter.persistent.shelterSimulationActive)
-                    
-
-
                     if (KRASHShelter.simCost + KRASHShelter.simSetupCost != 0 && 
                         KRASHShelter.startingFunds == Funding.Instance.Funds && 
                         !KRASHShelter.persistent.shelterSimulationActive ) {

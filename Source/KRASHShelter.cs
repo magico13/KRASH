@@ -156,6 +156,8 @@ namespace KRASH
         public static float dryMass { get; set; }
         public static float fuelMass { get; set; }
 
+        public static bool TestFlightFailuresDisabled { get; set; }
+
         void Awake()
 		{
 			Log.Info ("KRASHShelter.Awake");
